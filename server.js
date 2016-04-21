@@ -11,9 +11,9 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002);
-app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1");
+//
+// app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002);
+// app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1");
 
 var server = http.Server(app);
 var io = require('socket.io')(server);
@@ -67,7 +67,6 @@ app.use(function (err, req, res, next) {
 
 io.sockets.on('connection', function (socket){twing.socketOnConnectionCallback(io,socket)});
 
-
-server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002, process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1");
+server.listen(8888);
 
 module.exports = app;
