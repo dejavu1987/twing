@@ -1,0 +1,35 @@
+extends layout
+
+block stage
+  .stage
+      .loading.overlay
+        .desc.clearfix
+          .title
+            h3 Twing
+          .progressbar
+            .progress-label Loading...
+          .view-9-150
+      .instructions.overlay
+        a.close.cross(href='#') 
+          i.icon-remove
+        .title
+          h3 Twing!
+        .how-to-play
+          h3 How to play:
+          .desc.clearfix
+            ol.how-to-list
+              li.how-to-item.how-to-item-1 Drag a yellow disc and drop it to Gray tile with same symbol on it.
+              li.how-to-item.how-to-item-2 The tile will turn green and you will get 100 points.
+              li.how-to-item.how-to-item-3 The opponents does the same the gray tile will turn red.
+              li.how-to-item.how-to-item-4
+                | Golden discs will give you 
+                strong  +125 
+                | bonus scores.
+            a#close-overlay.close.button(href='#') Okey, Lets Play!
+        .draggable &#xf0a7;
+        .droppable &#xf0a7;
+        .cursor
+        .score-up +100
+  .friends
+    ul.friends-list
+  
