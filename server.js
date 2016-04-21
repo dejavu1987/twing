@@ -68,6 +68,5 @@ app.use(function (err, req, res, next) {
 io.sockets.on('connection', function (socket){twing.socketOnConnectionCallback(io,socket)});
 
 
-server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002);
 
 module.exports = app;
