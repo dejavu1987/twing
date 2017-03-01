@@ -17,7 +17,7 @@ var io;
 var debug = [];
 FB.setAccessToken('527804323931798|vEinKlwRdO8Jxm6TcpcNLSW-OkI');
 // Connect to MongoDB
-mongoose.connect(OPENSHIFT_MONGODB_DB_URL);
+mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL);
 //mongoose.connect('mongodb://nodejitsu:961ec2c420954980e319c721f31b0f21@linus.mongohq.com:10018/nodejitsudb3601504410');
 //mongoose.connect('mongodb://localhost');
 
@@ -26,7 +26,7 @@ db.on('error', function(){
   console.log("DB connection error!");
   console.log("Reconnecting in 5s");
   setTimeout(function(){
-    mongoose.connect(OPENSHIFT_MONGODB_DB_URL);
+    mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL);
   },5000);
 });
 db.once('open', function () {
