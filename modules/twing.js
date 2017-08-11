@@ -17,6 +17,7 @@ var io;
 var debug = [];
 FB.setAccessToken('527804323931798|vEinKlwRdO8Jxm6TcpcNLSW-OkI');
 // Connect to MongoDB
+console.log("Connecting to MongoDB @ "+ process.env.OPENSHIFT_MONGODB_DB_URL);
 mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL);
 //mongoose.connect('mongodb://nodejitsu:961ec2c420954980e319c721f31b0f21@linus.mongohq.com:10018/nodejitsudb3601504410');
 //mongoose.connect('mongodb://localhost');

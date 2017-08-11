@@ -69,7 +69,7 @@ io.sockets.on('connection', function (socket) {
     twing.socketOnConnectionCallback(io, socket)
 });
 
-
+console.log("Server started: "+(process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1")+":"+ (process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002));
 server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002, process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1");
 
 module.exports = app;
