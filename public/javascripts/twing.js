@@ -593,7 +593,7 @@ $(function () {
                     availableTip = "Click to join " + hosts[hostName].name;
                     availableFlag = true;
                 }
-                hostsList += '<li class="' + hosts[hostName].name + ' available-' + availableFlag + '"><a title="' + availableTip + '" href="#" rel=' + hostName + '><strong>' + hosts[hostName].name + '</strong> (<strong class="host-player-count">' + hosts[hostName].players.length + '</strong>/5)</a><div class="players-in-host"><span>' + hosts[hostName].players.join('</span><span>') + '</span></div></li>';
+                hostsList += '<li class="' + hosts[hostName].name + ' available-' + availableFlag + '"><a title="' + availableTip + '" href="#" rel="' + hostName + '"><strong>' + hosts[hostName].name + '</strong> (<strong class="host-player-count">' + hosts[hostName].players.length + '</strong>/5)</a><div class="players-in-host"><span>' + hosts[hostName].players.join('</span><span>') + '</span></div></li>';
             }
         }
         if (noHosts) {
