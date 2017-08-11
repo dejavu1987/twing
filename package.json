@@ -18,7 +18,7 @@
     "morgan": "1.6.1",
     "serve-favicon": "2.3.0",
     "socket.io": "1.7.1",
-    "fb": "*",
+    "fb": "1.1",
     "mongoose": "3.6.8"
   }
 }
