@@ -165,7 +165,7 @@ $(function () {
         me.levelProgress = level.levelProgress;
         $('.me-image').empty().append('<img class="me-thumb" src="https://graph.facebook.com/' + me.fbMe.id + '/picture">');
         $('.me-info').empty();
-        $('.me-info').append('<div class="me-name">' + me.fbMe.first_name + '</div>');
+        $('.me-info').append('<div class="me-name">' + me.fbMe.name + '</div>');
         $('.me-info').append('<div class="me-money">' + me.money + '</div>');
         $('.me-info').append('<div class="me-level" title="Next level at scores of ' + me.nextLevelIn + '!" >\n\
     <div class="me-level-progress"><div class="me-level-text">Level ' + me.level + '</div><div class="filler" style="width:' + me.levelProgress + '%"></div></div></div>');
