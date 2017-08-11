@@ -71,14 +71,14 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
   socket.on('register me', function (fbMe) {
 //    console.log(fbMe);
     var room = 'lobby';
-    fbMe.first_name = fbMe.first_name.replace("'",'-');
+    fbMe.name = fbMe.name.replace("'",'-');
     for(var userID in users){
-      if(fbMe.first_name == users[userID].name){
-        fbMe.first_name = fbMe.first_name + Math.ceil(Math.random()*100);
+      if(fbMe.name == users[userID].name){
+        fbMe.name = fbMe.name + Math.ceil(Math.random()*100);
       }
     }
-    console.log(fbMe.first_name + " Connected!");
-    users[socket.id].name = fbMe.first_name;
+    console.log(fbMe.name + " Connected!");
+    users[socket.id].name = fbMe.name;
     users[socket.id].currScore = 0;
     users[socket.id].score = 0;
     users[socket.id].room = room;
@@ -366,7 +366,7 @@ socket.on('join duel', function (duelID) {
           var betMoney = users[userID].betMoney ? users[userID].betMoney : 10;
           ScoreM.findOneAndUpdate(
             {fbID: users[userID].fbMe.id}, 
-            {$inc:{score: users[userID].currScore, money: betMoney} , $set:{name: users[userID].fbMe.first_name+ " " +users[userID].fbMe.last_name}}, 
+            {$inc:{score: users[userID].currScore, money: betMoney} , $set:{name: users[userID].fbMe.name+ " " +users[userID].fbMe.last_name}},
             {upsert:true}, 
             function(){
 //                 console.log("Updated score for ");
