@@ -131,7 +131,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
 
     function createRoom(data) {
         if (users[socket.id].name == 'unnamed') {
-            socket.emit('error', "You are not registered to the game yet!");
+            socket.emit('problem', "You are not registered to the game yet!");
             return;
         }
         users[socket.id].currScore = 0;
@@ -182,7 +182,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
             socket.broadcast.to(me.room).emit('add me', users[socket.id]);
             socket.emit('userlist', {'me': me, 'roomName': rooms[room].name, 'users': usersInRoom(me.room, me.id)}); //2nd param to exclude me
         } else {
-            socket.emit('error', "Host not found. Other players may have left the host.");
+            socket.emit('problem', "Host not found. Other players may have left the host.");
         }
 
 

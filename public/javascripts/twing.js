@@ -181,7 +181,7 @@ $(function () {
             getNickname();
 
             if (!socketEventsBinded) {
-                socket.on('error', function (e) {
+                socket.on('problem', function (e) {
                     console.error(e);
                     dAlert(JSON.stringify(e), "error");
                 });
