@@ -284,7 +284,7 @@ $(function () {
                     var newScore = 100;
                     if (data.block % 11 == 0 || data.block > 39)
                         newScore += 100;
-                    $('#' + data.name + "-score").find('.score').text(parseInt($('#' + data.name + "-score").find('.score').text()) + newScore);
+                    $('#' + data.id + "-score").find('.score').text(parseInt($('#' + data.id + "-score").find('.score').text()) + newScore);
                     lockBlock(data.block);
                 });
                 socket.on('leave', function (leaver) {

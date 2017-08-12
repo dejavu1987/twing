@@ -315,7 +315,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
             newScore += 150;
         users[socket.id].currScore = newScore;
         socket.broadcast.to(me.room).emit('matched', {
-            'name': me.name,
+            'id': me.id,
             'block': block
         });
     });
@@ -378,7 +378,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
                     {fbID: users[userID].fbMe.id},
                     {
                         $inc: {score: users[userID].currScore, money: betMoney},
-                        $set: {name: users[userID].fbMe.name + " " + users[userID].fbMe.last_name}
+                        $set: {name: users[userID].fbMe.name}
                     },
                     {upsert: true},
                     function () {

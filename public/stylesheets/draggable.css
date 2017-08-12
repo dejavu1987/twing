@@ -371,6 +371,10 @@ span.status{
 .me-name{
   float:left;
   margin-right: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+    white-space: nowrap;
 }
 .me-money{
   float:left;
