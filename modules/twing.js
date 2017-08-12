@@ -110,6 +110,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
                         users[socket.id].score = myStats.score;
                         users[socket.id].money = myStats.money;
                         socket.emit('my stats', myStats);
+                        console.log(users);
                         socket.broadcast.to(me.room).emit('add me', users[socket.id]);
                     }
 
@@ -320,8 +321,13 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
     });
 
     socket.on('cursor move', function (position) {
+        // console.log("Broadcasting Cursor move to:");
+        // console.log("users:", users);
+        // console.log("Socket.id", socket.id);
+        // console.log("----");
         socket.broadcast.to(users[socket.id].room).emit('cursor move', {
             name: users[socket.id].name,
+            id: socket.id,
             'position': position
         });
 
@@ -482,31 +488,36 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
         }
     });
     socket.on('mass request', function (data) {
-        data.targets.forEach(function (target) {
-            ActionsM.findOneAndUpdate({
-                    senderID: users[socket.id].fbMe.id,
-                    targetID: target,
-                    type: data.type,
-                    name: data.name
-                },
-                {
-                    $set: {
+        if (data) {
+            data.targets.forEach(function (target) {
+                ActionsM.findOneAndUpdate({
                         senderID: users[socket.id].fbMe.id,
                         targetID: target,
                         type: data.type,
-                        name: data.name,
-                        amount: data.hasOwnProperty('amount') ? data.amount : 0
-                    }
-                },
-                {
-                    upsert: true
-                },
-                function (e) {
-                    console.log(" sent!");
-                    console.log(e);
-                });
+                        name: data.name
+                    },
+                    {
+                        $set: {
+                            senderID: users[socket.id].fbMe.id,
+                            targetID: target,
+                            type: data.type,
+                            name: data.name,
+                            amount: data.hasOwnProperty('amount') ? data.amount : 0
+                        }
+                    },
+                    {
+                        upsert: true
+                    },
+                    function (e) {
+                        console.log(" sent!");
+                        console.log(e);
+                    });
 
-        });
+            });
+        } else {
+            console.log('cancelled mass request');
+        }
+
     });
 
 

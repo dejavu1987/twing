@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
-
+var io = require('socket.io');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -16,7 +16,8 @@ app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080);
 app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
 
 var server = http.Server(app);
-var io = require('socket.io')(server);
+
+io = io.listen(server);
 var twing = require('./modules/twing');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

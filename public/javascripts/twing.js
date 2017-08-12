@@ -14,7 +14,7 @@ var room;
 var isiPad = navigator.userAgent.match(/iPad/i) != null;
 $(function () {
     var requestDelay = 10; // Delays the request sent while dragging/ mouse move
-    var draggSmoothness = 100; // Delays the request sent while dragging/ mouse move
+    var draggSmoothness = 50; // Delays the request sent while dragging/ mouse move
     var socket;
 
     window.fbAsyncInit = function () {
@@ -185,15 +185,7 @@ $(function () {
                     console.error(e);
                     dAlert(JSON.stringify(e), "error");
                 });
-                $('.stage').mousemove(function (e) {
-                    if (e.clientX % requestDelay == 0 || e.clientY % requestDelay == 0) {
-                        var sp = $('.stage').position();
-                        socket.emit('cursor move', {
-                            left: e.clientX - sp.left,
-                            top: e.clientY - sp.top
-                        });
-                    }
-                });
+
                 socket.on('my stats', function (myStats) {
                     $('.loading.overlay').fadeOut(function () {
                         $('.loading.overlay').remove()
@@ -215,8 +207,9 @@ $(function () {
                     });
                 });
                 socket.on('cursor move', function (data) {
+                    console.log(data);
                     var sp = $('.stage').position();
-                    $('#' + data.name + "-cursor").animate({
+                    $('#' + data.id + "-cursor").animate({
                         top: data.position.top,
                         left: data.position.left
                     }, {
@@ -227,7 +220,7 @@ $(function () {
                 socket.on('add me', function (me) {
 
 //            console.log("add me - me");
-//            console.log(me);
+                    console.log(me);
                     dlog(me.name + " joined!!", 'success');
                     addCursors(me);
                     addScore(me);
@@ -560,21 +553,21 @@ $(function () {
     function addScore(user) {
 //      console.log("addScore user");
 //      console.log(user);
-        if (!$('#' + user.name + '-score').length && user.name != 'unnamed')
-            $('.scores-list').append('<li class="others-score user-context" id="' + user.name + '-score" data-uid="' + user.fbMe.id + '" data-sid="' + user.id + '"  data-money="' + user.money + '" data-name="' + user.fbMe.name + '"><img class="list-user-thumb" src="https://graph.facebook.com/' + user.fbMe.id + '/picture"><label>' + user.name + '</label> [<span class="score">0</span>]</div>');
+        if (!$('#' + user.id + '-score').length && user.name != 'unnamed')
+            $('.scores-list').append('<li class="others-score user-context" id="' + user.id + '-score" data-uid="' + user.fbMe.id + '" data-sid="' + user.id + '"  data-money="' + user.money + '" data-name="' + user.fbMe.name + '"><img class="list-user-thumb" src="https://graph.facebook.com/' + user.fbMe.id + '/picture"><label>' + user.name + '</label> [<span class="score">0</span>]</div>');
     }
 
     function removeScore(user) {
-        $('.scores-list').find('#' + user + '-score').remove();
+        $('.scores-list').find('#' + user.id + '-score').remove();
     }
 
     function addCursors(user) {
-        if (!$('#' + user.name + '-cursor').length && user.name != 'unnamed')
-            $('.stage').append('<div class="cursor ' + user.fbMe.gender + '" id="' + user.name + '-cursor">' + user.name + '<span class="status"></span></div>');
+        if (!$('#' + user.id + '-cursor').length && user.name != 'unnamed')
+            $('.stage').append('<div class="cursor ' + user.fbMe.gender + '" id="' + user.id + '-cursor">' + user.name + '<span class="status"></span></div>');
     }
 
     function removeCursors(user) {
-        $("#" + user + "-cursor").remove();
+        $("#" + user.id + "-cursor").remove();
     }
 
     function showHosts(hosts) {
@@ -732,7 +725,7 @@ $(function () {
                 }
             }
         });
-        $(".stage").addClass("game-running");
+        $(".stage").addClass("game-running").on('mousemove', onStageMouseMove);
     }
 
     $(window).keypress(function (e) {
@@ -746,7 +739,15 @@ $(function () {
         }
     });
 
-
+    function onStageMouseMove(e) {
+        if (e.clientX % requestDelay == 0 || e.clientY % requestDelay == 0) {
+            var sp = $('.stage').position();
+            socket.emit('cursor move', {
+                left: e.clientX - sp.left,
+                top: e.clientY - sp.top
+            });
+        }
+    }
     function addDraggables(data) {
         $('.stage draggable,.stage droppable').remove();
         $('.my-score').text('0');
@@ -1014,7 +1015,7 @@ $(function () {
         $('.droppable').remove();
         $('.draggable').remove();
         socket.emit('leave room');
-        $(".stage").removeClass("game-running");
+        $(".stage").removeClass("game-running").off('mousemove', onStageMouseMove);
     }
 
     function brag(data) {
