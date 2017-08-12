@@ -326,7 +326,6 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
         // console.log("Socket.id", socket.id);
         // console.log("----");
         socket.broadcast.to(users[socket.id].room).emit('cursor move', {
-            name: users[socket.id].name,
             id: socket.id,
             'position': position
         });

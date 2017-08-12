@@ -13,8 +13,7 @@ var socketEventsBinded = false;
 var room;
 var isiPad = navigator.userAgent.match(/iPad/i) != null;
 $(function () {
-    var requestDelay = 10; // Delays the request sent while dragging/ mouse move
-    var draggSmoothness = 50; // Delays the request sent while dragging/ mouse move
+    var draggingBlock = false;
     var socket;
 
     window.fbAsyncInit = function () {
@@ -198,25 +197,25 @@ $(function () {
                     });
                 });
                 socket.on('drag', function (data) {
-                    $('.draggable[rel=' + data.block + ']').animate({
-                        top: data.position.top,
-                        left: data.position.left
-                    }, {
-                        queue: false,
-                        duration: draggSmoothness
-                    });
-                });
-                socket.on('cursor move', function (data) {
                     console.log(data);
-                    var sp = $('.stage').position();
-                    $('#' + data.id + "-cursor").animate({
-                        top: data.position.top,
-                        left: data.position.left
-                    }, {
-                        queue: false,
-                        duration: draggSmoothness
-                    });
+                    $('.draggable[rel=' + data.block + ']')
+                        .css({
+                            top: data.position.top,
+                            left: data.position.left
+                        });
+                    onCursorMove(data)
                 });
+                socket.on('cursor move', onCursorMove);
+
+                function onCursorMove(data) {
+                    // var sp = $('.stage').position();
+                    $('#' + data.id + "-cursor")
+                        .css({
+                            top: data.position.top,
+                            left: data.position.left
+                        });
+                }
+
                 socket.on('add me', function (me) {
 
 //            console.log("add me - me");
@@ -682,19 +681,30 @@ $(function () {
     function stageReady() {
         $('.draggable').draggable({
             containment: 'parent',
-            drag: function (event, ui) {
-                if (ui.position.left % requestDelay == 0 || ui.position.top % requestDelay == 0) {
-                    var sp = $('.stage').position();
-                    socket.emit('drag', {
-                        block: $(event.target).attr('rel'),
-                        position: {
-                            left: ui.position.left,
-                            top: ui.position.top
-                        }
-                    });
-                }
-            }
+            start: function () {
+                console.log("started dragging");
+                draggingBlock = true;
+            },
+            stop: function () {
+                console.log("stopped dragging");
+                draggingBlock = false;
+            },
+            drag: $.debounce(15, onBlockDrag)
+            // }
         });
+
+        function onBlockDrag(event, ui) {
+            // if (ui.position.left % requestDelay == 0 || ui.position.top % requestDelay == 0) {
+            // var sp = $('.stage').position();
+            socket.emit('drag', {
+                id: me.id,
+                block: $(event.target).attr('rel'),
+                position: {
+                    left: ui.position.left,
+                    top: ui.position.top
+                }
+            });
+        }
 
         $('.droppable').droppable({
             accept: '.draggable',
@@ -725,7 +735,20 @@ $(function () {
                 }
             }
         });
-        $(".stage").addClass("game-running").on('mousemove', onStageMouseMove);
+        $(".stage").addClass("game-running").on('mousemove', $.debounce(15, onStageMouseMove));
+    }
+
+    function onStageMouseMove(e) {
+        if (!draggingBlock) {
+            // if (e.clientX % requestDelay == 0 || e.clientY % requestDelay == 0) {
+            var sp = $('.stage').position();
+            socket.emit('cursor move', {
+                left: e.clientX - sp.left,
+                top: e.clientY - sp.top
+            });
+            // }
+        }
+
     }
 
     $(window).keypress(function (e) {
@@ -739,15 +762,7 @@ $(function () {
         }
     });
 
-    function onStageMouseMove(e) {
-        if (e.clientX % requestDelay == 0 || e.clientY % requestDelay == 0) {
-            var sp = $('.stage').position();
-            socket.emit('cursor move', {
-                left: e.clientX - sp.left,
-                top: e.clientY - sp.top
-            });
-        }
-    }
+
     function addDraggables(data) {
         $('.stage draggable,.stage droppable').remove();
         $('.my-score').text('0');
