@@ -70,7 +70,7 @@ io.sockets.on('connection', function (socket) {
     twing.socketOnConnectionCallback(io, socket)
 });
 
-console.log("Server started: " + (process.env.NODEJS_IP || "127.9.201.1") + ":" + (process.env.NODEJS_PORT || process.env.PORT || 3002));
-server.listen(process.env.NODEJS_PORT || process.env.PORT || 3002, process.env.NODEJS_IP || "127.9.201.1");
+console.log("Server started: " + (process.env.NODEJS_IP || "127.0.0.1") + ":" + (process.env.NODEJS_PORT || process.env.PORT || 8080));
+server.listen(process.env.NODEJS_PORT || process.env.PORT || 3002, process.env.NODEJS_IP || "127.0.0.1");
 
 module.exports = app;
