@@ -1,7 +1,5 @@
-var myFB = {};
 var currentUrl = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname;
 var me = {};
-var host = {};
 var gifts = {
     'coins10': "10 coins",
     'coinsLvl': "x coins"
@@ -12,6 +10,7 @@ var sendMassGiftTo = [];
 var socketEventsBinded = false;
 var room;
 var isiPad = navigator.userAgent.match(/iPad/i) != null;
+
 $(function () {
     var draggingBlock = false;
     var socket;
@@ -184,7 +183,6 @@ $(function () {
                     console.error(e);
                     dAlert(JSON.stringify(e), "error");
                 });
-
                 socket.on('my stats', function (myStats) {
                     $('.loading.overlay').fadeOut(function () {
                         $('.loading.overlay').remove()
@@ -206,16 +204,6 @@ $(function () {
                     onCursorMove(data)
                 });
                 socket.on('cursor move', onCursorMove);
-
-                function onCursorMove(data) {
-                    // var sp = $('.stage').position();
-                    $('#' + data.id + "-cursor")
-                        .css({
-                            top: data.position.top,
-                            left: data.position.left
-                        });
-                }
-
                 socket.on('add me', function (me) {
 
 //            console.log("add me - me");
@@ -224,7 +212,6 @@ $(function () {
                     addCursors(me);
                     addScore(me);
                 });
-
                 socket.on('hosts', function (hosts) {
                     console.log("Got hosts!");
                     $('.leave-room').remove();
@@ -247,7 +234,6 @@ $(function () {
                     $('.theme').html(data.theme.name);
 
                 });
-
                 socket.on('userlist', function (data) {
 
 //            console.log('userlist data.me');
@@ -351,7 +337,6 @@ $(function () {
                     });
 
                 });
-
                 socket.on('notifications', function (notifications) {
                     var notificationsHtml = "";
 
@@ -384,8 +369,6 @@ $(function () {
                         height: 456
                     });
                 });
-
-
                 socket.on('remove room', function (room) {
                     $(".hosts-list>li." + room).remove();
                 });
@@ -438,7 +421,6 @@ $(function () {
                     $('.stage').append(duelOverlay);
                     $(".duel-overlay").hide().slideDown().draggable;
                 });
-
                 socket.on('gift', function (data) {
                     console.log("New Gift!");
 //            console.log(data);
@@ -453,7 +435,6 @@ $(function () {
                     $('.stage').append(duelOverlay);
                     $(".duel-overlay").hide().slideDown().draggable();
                 });
-
                 socket.on('appFriends', function (data) {
                     console.log("Got AppFriends score data!");
                     console.log(data);
@@ -468,8 +449,6 @@ $(function () {
                         scrollFriends(e.originalEvent);
                     });
                 });
-
-
                 socket.on('game over', function (users) {
                     console.log("Game Over!");
 //           console.log(users);
@@ -527,11 +506,19 @@ $(function () {
 
 
                 });
-
                 socket.on('message', function (data) {
                     dlog(data.name + " > " + data.message, 'message');
 //            $('#'+data.name+"-cursor").find('span.status').text(data.message);
                 });
+
+                function onCursorMove(data) {
+                    // var sp = $('.stage').position();
+                    $('#' + data.id + "-cursor")
+                        .css({
+                            top: data.position.top,
+                            left: data.position.left
+                        });
+                }
             } else {
                 console.log("Reconnected with server!");
             }
@@ -539,6 +526,219 @@ $(function () {
 
         });
     }
+
+    $(document).ready(function () {
+        if (!isiPad) {
+            $(document).tooltip();
+        }
+        $(".progressbar").progressbar({
+            value: false
+        });
+        $body = $('body');
+        $body.delegate('.close', 'click', function (e) {
+            e.preventDefault();
+            $(this).closest('.overlay').remove();
+        });
+        $body.delegate('.share.brag', 'click', function (e) {
+            e.preventDefault();
+            brag(bragData);
+        });
+        $body.delegate('.send-mass-gifts', 'click', function (e) {
+            e.preventDefault();
+            $(this).closest('.overlay').remove();
+            if (sendMassGiftTo.length <= 50) {
+                FB.ui({
+                    method: 'apprequests',
+                    title: 'Gift some coins!',
+                    to: sendMassGiftTo,
+                    message: 'Here are some coins. You may use them to bet on duel games.'
+                }, function (response) {
+                    socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'gift', amount: 10});
+                });
+            } else {
+                var pages = Math.ceil(sendMassGiftTo.length / 50);
+                for (var i = 0; i < pages; i++) {
+                    FB.ui({
+                        method: 'apprequests',
+                        title: 'Gift some coins!',
+                        to: sendMassGiftTo.splice(0, 50),
+                        message: 'Here are some coins. You may use them to bet on duel games.'
+                    }, function (response) {
+                        console.log(response.to);
+                        socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'gift', amount: 10});
+                    });
+                }
+            }
+
+        });
+        $body.delegate('.send-mass-help-request', 'click', function (e) {
+            e.preventDefault();
+            $(this).closest('.overlay').remove();
+            FB.ui({
+                method: 'apprequests',
+                title: 'Ask for coins!',
+                to: getRandomFrineds(50),
+                message: 'I am out of coins, Please send me some.'
+            }, function (response) {
+                socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'help', amount: 10});
+            });
+        });
+        $body.delegate('.accept-help', 'click', function (e) {
+            e.preventDefault();
+            $(this).closest('.notification-item').fadeOut('slow');
+            var actionID = $(e.currentTarget).attr('data-action-id');
+            var target = {
+                uid: $(e.currentTarget).attr('data-sender'),
+                sid: 'offline'
+            };
+            FB.ui({
+                method: 'apprequests',
+                title: 'Send coins!',
+                to: target.uid,
+                message: 'Here are some coins. You may use them to bet on duel games.'
+            }, function (response) {
+                socket.emit('mass request', {
+                    targets: [target.uid],
+                    name: 'coinsLvl',
+                    type: 'gift',
+                    amount: me.level * 10
+                });
+                socket.emit('accept help', actionID);
+            });
+        });
+        $body.delegate('a.highscores.button', 'click', function (e) {
+            e.preventDefault();
+            socket.emit('highscores');
+        });
+        $body.delegate('a.notifications.button', 'click', function (e) {
+            e.preventDefault();
+            socket.emit('notifications');
+        });
+        $body.delegate('.invite', 'click', function (e) {
+            e.preventDefault();
+            FB.ui({
+                method: 'apprequests',
+                title: 'Lets Twing!',
+                message: 'I am online can you join me right now. Twing is a multiplayer puzzle game.'
+            }, function (response) {
+                //        console.log(response.to);
+            });
+        });
+        $body.delegate('.hosts-list>li.available-true>a', 'click', function (e) {
+            e.preventDefault();
+            $('.hosts').remove();
+            socket.emit('join room', $(this).attr('rel'));
+        });
+        $body.delegate('.hosts-list>li.available-false>a', 'click', function (e) {
+            e.preventDefault();
+            dlog("You cant join this game, the game is in progress!", 'error');
+        });
+        $body.delegate('.create-host', 'click', function (e) {
+            e.preventDefault();
+            $('.hosts').remove();
+            socket.emit('create room', {roomID: '', bet: 0});
+        });
+        $body.delegate('li.user-context', 'click', function (e) {
+            showContextMenu(e);
+        });
+        $body.delegate('li.user-context', 'mouseleave', function (e) {
+            $('.context-menu').remove();
+        });
+        $body.delegate('li.context-link', 'click', function (e) {
+            e.stopPropagation();
+            $('.context-menu').remove();
+            var action = $(e.currentTarget).attr('data-action');
+            var target = {
+                uid: $(e.currentTarget).attr('data-uid'),
+                sid: $(e.currentTarget).attr('data-sid')
+            };
+            var amount = 0;
+            if (action == 'challenge') {
+                var targetMoney = $(e.currentTarget).attr('data-money');
+                var maxBet = targetMoney < me.money ? targetMoney : me.money;
+                var userBet = parseInt(prompt("Enter Bet Amount, MAX: " + maxBet));
+                userBet = userBet ? userBet : 10;
+                userBet = (userBet > 0) ? userBet : 10;
+                amount = userBet > maxBet ? maxBet : userBet;
+            }
+            doActionOnUser({action: action, target: target, amount: amount});
+            $('.context-menu').remove();
+        });
+        $body.delegate('.accept-duel', 'click', function (e) {
+            e.preventDefault();
+            var duel = $(e.currentTarget).attr('data-duel-id');
+            socket.emit('accept duel', duel);
+            $('.overlay').remove();
+        });
+        $body.delegate('.reject-duel', 'click', function (e) {
+            e.preventDefault();
+            var duel = $(e.currentTarget).attr('data-duel-id');
+            socket.emit('reject duel', duel);
+            $(e.currentTarget).closest('.overlay').remove();
+        });
+        $body.delegate('.join-duel', 'click', function (e) {
+            e.preventDefault();
+            var duel = $(e.currentTarget).attr('data-duel-id');
+            socket.emit('join duel', duel);
+            $('.overlay').remove();
+        });
+        $body.delegate('.get-level-coins', 'click', function (e) {
+            e.preventDefault();
+            $this = $(this);
+            if ($this.hasClass('disabled'))
+                return false;
+            $this.addClass('disabled');
+            var target = $(e.currentTarget).attr('data-fbId');
+            var data = {};
+            data.targets = [target];
+            data.type = 'help';
+            data.name = 'coinsLvl';
+            data.amount = $(e.currentTarget).attr('data-amount');
+            FB.ui({
+                method: 'apprequests',
+                title: 'Ask for coins!',
+                to: target,
+                message: 'I am out of coins, Please send me some.'
+            }, function (response) {
+                socket.emit('mass request', data);
+            });
+        });
+        $body.delegate('.accept-gift', 'click', function (e) {
+            $(this).closest('.notification-item').fadeOut('slow');
+            e.preventDefault();
+            var actionId = $(e.currentTarget).attr('data-action-id');
+            var amount = $(e.currentTarget).attr('data-amount');
+            me.money += parseInt(amount);
+            updateMeInfo();
+            socket.emit('accept gift', actionId);
+        });
+        $body.delegate('.leave-room', 'click', function (e) {
+            e.preventDefault();
+            leaveRoom();
+        });
+        $body.delegate('.ready', 'click', function (e) {
+            e.preventDefault();
+            $('.overlay').remove();
+            socket.emit('ready');
+        });
+        //            $body.delegate('.rematch','click',function(e){
+        //              e.preventDefault();
+        //              $('.overlay').remove();
+        //              socket.emit('rematch');
+        //              addDraggables();
+        //            });
+        //          $('#sidebar').draggable();
+    });
+    $(window).keypress(function (e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            var msg = prompt('Message');
+            if (msg) {
+                socket.emit('message', msg);
+                dlog("Me > " + msg, 'my-message');
+            }
+        }
+    });
 
     function fbCallback(response) {
         console.log(response);
@@ -611,7 +811,7 @@ $(function () {
         $(".droppable[rel=" + block + "]").addClass('lost');
     }
 
-    //        Rearrange the Blocks after reading the maps from server
+    // Rearrange the Blocks after reading the maps from server
     function sortBlocks(data) {
         var $draggables = $('.draggable');
         var elements = [];
@@ -751,18 +951,6 @@ $(function () {
 
     }
 
-    $(window).keypress(function (e) {
-        if (e.which == 13) {
-            e.preventDefault();
-            var msg = prompt('Message');
-            if (msg) {
-                socket.emit('message', msg);
-                dlog("Me > " + msg, 'my-message');
-            }
-        }
-    });
-
-
     function addDraggables(data) {
         $('.stage draggable,.stage droppable').remove();
         $('.my-score').text('0');
@@ -788,213 +976,6 @@ $(function () {
                 .append('<div class="droppable" rel="' + i + '">&#x' + hexVal + ';</div>');
         }
     }
-
-    $(document).ready(function () {
-        if (!isiPad) {
-            $(document).tooltip();
-        }
-        $(".progressbar").progressbar({
-            value: false
-        });
-        $('body').delegate('.close', 'click', function (e) {
-            e.preventDefault();
-            $(this).closest('.overlay').remove();
-        });
-        $('body').delegate('.share.brag', 'click', function (e) {
-            e.preventDefault();
-            brag(bragData);
-        });
-        $('body').delegate('.send-mass-gifts', 'click', function (e) {
-            e.preventDefault();
-            $(this).closest('.overlay').remove();
-            if (sendMassGiftTo.length <= 50) {
-                FB.ui({
-                    method: 'apprequests',
-                    title: 'Gift some coins!',
-                    to: sendMassGiftTo,
-                    message: 'Here are some coins. You may use them to bet on duel games.'
-                }, function (response) {
-                    socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'gift', amount: 10});
-                });
-            } else {
-                var pages = Math.ceil(sendMassGiftTo.length / 50);
-                for (var i = 0; i < pages; i++) {
-                    FB.ui({
-                        method: 'apprequests',
-                        title: 'Gift some coins!',
-                        to: sendMassGiftTo.splice(0, 50),
-                        message: 'Here are some coins. You may use them to bet on duel games.'
-                    }, function (response) {
-                        console.log(response.to);
-                        socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'gift', amount: 10});
-                    });
-                }
-            }
-
-        });
-        $('body').delegate('.send-mass-help-request', 'click', function (e) {
-            e.preventDefault();
-            $(this).closest('.overlay').remove();
-            FB.ui({
-                method: 'apprequests',
-                title: 'Ask for coins!',
-                to: getRandomFrineds(50),
-                message: 'I am out of coins, Please send me some.'
-            }, function (response) {
-                socket.emit('mass request', {targets: response.to, name: 'coins10', type: 'help', amount: 10});
-            });
-        });
-        $('body').delegate('.accept-help', 'click', function (e) {
-            e.preventDefault();
-            $(this).closest('.notification-item').fadeOut('slow');
-            var actionID = $(e.currentTarget).attr('data-action-id');
-            var target = {
-                uid: $(e.currentTarget).attr('data-sender'),
-                sid: 'offline'
-            };
-            FB.ui({
-                method: 'apprequests',
-                title: 'Send coins!',
-                to: target.uid,
-                message: 'Here are some coins. You may use them to bet on duel games.'
-            }, function (response) {
-                socket.emit('mass request', {
-                    targets: [target.uid],
-                    name: 'coinsLvl',
-                    type: 'gift',
-                    amount: me.level * 10
-                });
-                socket.emit('accept help', actionID);
-            });
-        });
-        $('body').delegate('a.highscores.button', 'click', function (e) {
-            e.preventDefault();
-            socket.emit('highscores');
-        });
-        $('body').delegate('a.notifications.button', 'click', function (e) {
-            e.preventDefault();
-            socket.emit('notifications');
-        });
-        $('body').delegate('.invite', 'click', function (e) {
-            e.preventDefault();
-            FB.ui({
-                method: 'apprequests',
-                title: 'Lets Twing!',
-                message: 'I am online can you join me right now. Twing is a multiplayer puzzle game.'
-            }, function (response) {
-                //        console.log(response.to);
-            });
-        });
-        $('body').delegate('.hosts-list>li.available-true>a', 'click', function (e) {
-            e.preventDefault();
-            $('.hosts').remove();
-            socket.emit('join room', $(this).attr('rel'));
-        });
-        $('body').delegate('.hosts-list>li.available-false>a', 'click', function (e) {
-            e.preventDefault();
-            dlog("You cant join this game, the game is in progress!", 'error');
-        });
-        $('body').delegate('.create-host', 'click', function (e) {
-            e.preventDefault();
-            $('.hosts').remove();
-            socket.emit('create room', {roomID: '', bet: 0});
-        });
-
-        $('body').delegate('li.user-context', 'click', function (e) {
-            showContextMenu(e);
-        });
-        $('body').delegate('li.user-context', 'mouseleave', function (e) {
-            $('.context-menu').remove();
-        });
-
-        $('body').delegate('li.context-link', 'click', function (e) {
-            e.stopPropagation();
-            $('.context-menu').remove();
-            var action = $(e.currentTarget).attr('data-action');
-            var target = {
-                uid: $(e.currentTarget).attr('data-uid'),
-                sid: $(e.currentTarget).attr('data-sid')
-            };
-            var amount = 0;
-            if (action == 'challenge') {
-                var targetMoney = $(e.currentTarget).attr('data-money');
-                var maxBet = targetMoney < me.money ? targetMoney : me.money;
-                var userBet = parseInt(prompt("Enter Bet Amount, MAX: " + maxBet));
-                userBet = userBet ? userBet : 10;
-                userBet = (userBet > 0) ? userBet : 10;
-                amount = userBet > maxBet ? maxBet : userBet;
-            }
-            doActionOnUser({action: action, target: target, amount: amount});
-            $('.context-menu').remove();
-        });
-        $('body').delegate('.accept-duel', 'click', function (e) {
-            e.preventDefault();
-            var duel = $(e.currentTarget).attr('data-duel-id');
-            socket.emit('accept duel', duel);
-            $('.overlay').remove();
-        });
-        $('body').delegate('.reject-duel', 'click', function (e) {
-            e.preventDefault();
-            var duel = $(e.currentTarget).attr('data-duel-id');
-            socket.emit('reject duel', duel);
-            $(e.currentTarget).closest('.overlay').remove();
-        });
-        $('body').delegate('.join-duel', 'click', function (e) {
-            e.preventDefault();
-            var duel = $(e.currentTarget).attr('data-duel-id');
-            socket.emit('join duel', duel);
-            $('.overlay').remove();
-        });
-        $('body').delegate('.get-level-coins', 'click', function (e) {
-            e.preventDefault();
-            $this = $(this);
-            if ($this.hasClass('disabled'))
-                return false;
-            $this.addClass('disabled');
-            var target = $(e.currentTarget).attr('data-fbId');
-            var data = {};
-            data.targets = [target];
-            data.type = 'help';
-            data.name = 'coinsLvl';
-            data.amount = $(e.currentTarget).attr('data-amount');
-            FB.ui({
-                method: 'apprequests',
-                title: 'Ask for coins!',
-                to: target,
-                message: 'I am out of coins, Please send me some.'
-            }, function (response) {
-                socket.emit('mass request', data);
-            });
-        });
-        $('body').delegate('.accept-gift', 'click', function (e) {
-            $(this).closest('.notification-item').fadeOut('slow');
-            e.preventDefault();
-            var actionId = $(e.currentTarget).attr('data-action-id');
-            var amount = $(e.currentTarget).attr('data-amount');
-            me.money += parseInt(amount);
-            updateMeInfo();
-            socket.emit('accept gift', actionId);
-        });
-
-        $('body').delegate('.leave-room', 'click', function (e) {
-            e.preventDefault();
-            leaveRoom();
-        });
-
-
-        $('body').delegate('.ready', 'click', function (e) {
-            e.preventDefault();
-            $('.overlay').remove();
-            socket.emit('ready');
-        });
-        //            $('body').delegate('.rematch','click',function(e){
-        //              e.preventDefault();
-        //              $('.overlay').remove();
-        //              socket.emit('rematch');
-        //              addDraggables();
-        //            });
-        //          $('#sidebar').draggable();
-    });
 
     function showContextMenu(e) {
         var $context = $(e.currentTarget)

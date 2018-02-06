@@ -12,8 +12,8 @@ var users = require('./routes/users');
 
 var app = express();
 //
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080);
-app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
+app.set('port', process.env.NODEJS_PORT || process.env.PORT || 8080);
+app.set('ip', process.env.NODEJS_IP || "127.0.0.1");
 
 var server = http.Server(app);
 
@@ -70,7 +70,7 @@ io.sockets.on('connection', function (socket) {
     twing.socketOnConnectionCallback(io, socket)
 });
 
-console.log("Server started: "+(process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1")+":"+ (process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002));
-server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3002, process.env.OPENSHIFT_NODEJS_IP || "127.9.201.1");
+console.log("Server started: " + (process.env.NODEJS_IP || "127.9.201.1") + ":" + (process.env.NODEJS_PORT || process.env.PORT || 3002));
+server.listen(process.env.NODEJS_PORT || process.env.PORT || 3002, process.env.NODEJS_IP || "127.9.201.1");
 
 module.exports = app;
