@@ -21,9 +21,11 @@ $(function () {
             xfbml: true,
             status: true, // check login status
             cookie: true, // enable cookies to allow the server to access the session
-            appId: 527804323931798,
-            frictionlessRequests: true
+            appId: '527804323931798',
+            frictionlessRequests: true,
+            version    : 'v2.12'
         });
+        FB.AppEvents.logPageView();
         FB.getLoginStatus(function (response) {
             var loginStatus = response;
             if (response.status === 'connected') {
@@ -35,7 +37,7 @@ $(function () {
                 var fql_query = "SELECT uid FROM page_fan WHERE page_id = " + page_id + "and uid=" + user_id;
                 FB.Data.query(fql_query).wait(function (rows) {
                     if (rows.length == 1 && rows[0].uid == user_id) {
-                        $('<p>&copy; http://twing.jit.su 2013</p>').appendTo('#footer');
+                        $('<p>&copy; https://apps.facebook.com/twingjitsu 2013</p>').appendTo('#footer');
                     } else {
                         $.tmpl('likePage', {}).appendTo('#footer');
                     }
@@ -155,19 +157,24 @@ $(function () {
     };
     window.updateMeInfo = function (callback) {
         console.log("Updating my info!");
+
+        var $me = $('.me-info');
         var level = userLevelCalculate(me.score);
+
         me.level = level.level;
         gifts['coinsLvl'] = (me.level * 10) + " coins";
         me.thisLevelIn = level.thisLevelIn;
         me.nextLevelIn = level.nextLevelIn;
         me.levelProgress = level.levelProgress;
         $('.me-image').empty().append('<img class="me-thumb" src="https://graph.facebook.com/' + me.fbMe.id + '/picture">');
-        $('.me-info').empty();
-        $('.me-info').append('<div class="me-name">' + me.fbMe.name + '</div>');
-        $('.me-info').append('<div class="me-money">' + me.money + '</div>');
-        $('.me-info').append('<div class="me-level" title="Next level at scores of ' + me.nextLevelIn + '!" >\n\
+
+
+        $me.empty();
+        $me.append('<div class="me-name">' + me.fbMe.name + '</div>');
+        $me.append('<div class="me-money">' + me.money + '</div>');
+        $me.append('<div class="me-level" title="Next level at scores of ' + me.nextLevelIn + '!" >\n\
     <div class="me-level-progress"><div class="me-level-text">Level ' + me.level + '</div><div class="filler" style="width:' + me.levelProgress + '%"></div></div></div>');
-        $('.me-info').append('<div class="theme"></div><div class="my-score"></div>');
+        $me.append('<div class="theme"></div><div class="my-score"></div>');
         if (callback)
             callback();
     };
@@ -184,8 +191,9 @@ $(function () {
                     dAlert(JSON.stringify(e), "error");
                 });
                 socket.on('my stats', function (myStats) {
-                    $('.loading.overlay').fadeOut(function () {
-                        $('.loading.overlay').remove()
+                    const $1 = $('.loading.overlay');
+                    $1.fadeOut(function () {
+                        $1.remove()
                     });
                     console.log("Registered!! Got my stats!");
                     me.score = myStats.score;
@@ -240,8 +248,11 @@ $(function () {
 //            console.log(data.me);
                     me = data.me;
                     room = data.roomName;
-                    $(".room").empty();
-                    $(".room").append("<strong> " + data.roomName + "</strong>");
+                    var $room = $(".room");
+
+                    $room.empty();
+                    $room
+                        .append("<strong> " + data.roomName + "</strong>");
                     //console.log(users);
                     if (room != 'lobby') {
                         $('.stage').append('<div class="overlay"><div class="ready-wrapper"><a href="#" class="ready button">READY</a></div></div>');
@@ -443,8 +454,9 @@ $(function () {
                         return a;
                     });
                     $.tmpl('friend', data).appendTo(".friends-list");
-                    $('.friends-list').width($('.friends-list>li').length * 200)
-                    $('.friends-list').mousewheel(function (e) {
+                    var $friends = $('.friends-list');
+                    $friends.width($('.friends-list>li').length * 200)
+                    $friends.mousewheel(function (e) {
                         e.preventDefault();
                         scrollFriends(e.originalEvent);
                     });
