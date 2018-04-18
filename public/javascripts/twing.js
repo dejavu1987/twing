@@ -22,10 +22,8 @@ $(function () {
             status: true, // check login status
             cookie: true, // enable cookies to allow the server to access the session
             appId: '527804323931798',
-            frictionlessRequests: true,
-            version    : 'v2.12'
+            frictionlessRequests: true
         });
-        FB.AppEvents.logPageView();
         FB.getLoginStatus(function (response) {
             var loginStatus = response;
             if (response.status === 'connected') {
