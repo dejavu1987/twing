@@ -1,3 +1,10 @@
+
+class Twing {
+    constructor(pageId){
+        this.pageId = pageId;
+    }
+}
+
 var currentUrl = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname;
 var me = {};
 var gifts = {
@@ -11,26 +18,30 @@ var socketEventsBinded = false;
 var room;
 var isiPad = navigator.userAgent.match(/iPad/i) != null;
 
+var page_id = 524826927563869;
+var app_id = 527804323931798;
+
 $(function () {
     var draggingBlock = false;
     var socket;
 
     window.fbAsyncInit = function () {
-        console.log("Connecting to FB!");
+        console.log("Initializing to FB!");
         FB.init({
             xfbml: true,
             status: true, // check login status
             cookie: true, // enable cookies to allow the server to access the session
-            appId: '527804323931798',
+            appId: app_id,
             frictionlessRequests: true
         });
+        console.log("Getting login status!");
         FB.getLoginStatus(function (response) {
             var loginStatus = response;
             if (response.status === 'connected') {
                 console.log("Logged in to FB!");
                 console.log(response);
 
-                var page_id = 524826927563869;
+
                 var user_id = response.authResponse.userID;
                 var fql_query = "SELECT uid FROM page_fan WHERE page_id = " + page_id + "and uid=" + user_id;
                 FB.Data.query(fql_query).wait(function (rows) {
@@ -42,13 +53,13 @@ $(function () {
                 });
 
 
-                FB.api('/me', function (response) {
-                    if (response.id) {
+                FB.api('/me', function (meRes) {
+                    if (meRes.id) {
                         console.log("Got user info!");
-                        me.fbMe = response;
+                        me.fbMe = meRes;
                         socket = io.connect();
                         socketEvents();
-                        console.log(response);
+                        console.log(meRes);
                     } else {
                         console.warn("Could not connect to graph server");
                         me.fbMe = {};
@@ -56,9 +67,8 @@ $(function () {
                         socket = io.connect();
                         socketEvents();
                     }
-
-
                 });
+
                 console.log("Getting Twing player frens!");
                 FB.api('/me/friends?fields=installed', function (response) {
                     console.log('Got twing player frens!');
@@ -89,25 +99,40 @@ $(function () {
 
             } else {
                 console.log("FB not logged in!");
-                // not_authorized
-                if (document.referrer) {
-                    // In the facebook iframe, redirect wont work.
-                    if (document.referrer.match(/apps.facebook.com/)) {
-                        console.log("FB App canvas detected!");
-                        FBLogin();
-                    } else {
-                        console.log("No FB App canvas detected, redirecting to FB login page!");
-                        window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
-                    }
-                } else {
-                    console.log("No FB App canvas detected, redirecting to FB login page!");
-                    window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
-                }
-
+                var name = showLoginOptions();
+                console.warn("just login");
+                me.fbMe = {};
+                me.fbMe.id = Math.round(Math.random()*9999999);
+                me.fbMe.name = name;
+                socket = io.connect();
+                socketEvents();
             }
         });
-
     };
+
+    function showLoginOptions() {
+        if(confirm("Do you want to login with facebook?")){
+            loginWithFacebook();
+        }else{
+            return prompt("Enter a Nickname!");
+        }
+    }
+
+    function loginWithFacebook() {
+        if (document.referrer) {
+            // In the facebook iframe, redirect wont work.
+            if (document.referrer.match(/apps.facebook.com/)) {
+                console.log("FB App canvas detected!");
+                FBLogin();
+            } else {
+                console.log("No FB App canvas detected, redirecting to FB login page!");
+                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
+            }
+        } else {
+            console.log("No FB App canvas detected, redirecting to FB login page!");
+            window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
+        }
+    }
 
     function FBLogin() {
         console.log("Attempting login FB!");
