@@ -1,8 +1,10 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose')
-    , FB = require('fb');
+var mongoose = require('mongoose'),
+    Jabber = require('jabber'),
+    jabber = new Jabber(),
+    FB = require('fb');
 var ScoreM, ActionsM;
 var users = {};
 var duels = {};
@@ -71,7 +73,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
     socket.on('register me', function (fbMe) {
 //    console.log(fbMe);
         var room = 'lobby';
-        fbMe.name = fbMe.name.replace("'", '-');
+        fbMe.name = fbMe.name ? fbMe.name.replace("'", '-') : (jabber.createWord(5, true)+ " " +jabber.createWord(6, true));
         for (var userID in users) {
             if (fbMe.name == users[userID].name) {
                 fbMe.name = fbMe.name + Math.ceil(Math.random() * 100);
@@ -400,7 +402,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
 
     socket.on('get appFriends', function (appFriends) {
         ScoreM.find({fbID: {$in: appFriends}}).sort('-score').limit(150).exec(function (err, scores) {
-            if(err){
+            if (err) {
                 console.log(err);
             }
             socket.emit('appFriends', scores);
@@ -409,7 +411,7 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
 
     socket.on('highscores', function () {
         ScoreM.find().sort('-score').limit(30).exec(function (err, scores) {
-            if(err){
+            if (err) {
                 console.log(err);
             }
             socket.emit('highscores', scores);
@@ -577,7 +579,7 @@ shuffle = function (array) {
     var i = array.length, j, tempi, tempj;
     if (i == 0) return array;
     while (--i) {
-        j = Math.floor(Math.random() * ( i + 1 ));
+        j = Math.floor(Math.random() * (i + 1));
         tempi = array[i];
         tempj = array[j];
         array[i] = tempj;
