@@ -99,22 +99,21 @@ $(function () {
 
             } else {
                 console.log("FB not logged in!");
-                var name = showLoginOptions();
-                console.warn("just login");
-                me.fbMe = {};
-                me.fbMe.id = Math.round(Math.random()*9999999);
-                me.fbMe.name = name;
-                socket = io.connect();
-                socketEvents();
+                showLoginOptionsAndLogin();
+
             }
         });
     };
 
-    function showLoginOptions() {
+    function showLoginOptionsAndLogin() {
         if(confirm("Do you want to login with facebook?")){
             loginWithFacebook();
         }else{
-            return prompt("Enter a Nickname!");
+            me.fbMe = {};
+            me.fbMe.id = Math.round(Math.random()*9999999);
+            me.fbMe.name = prompt("Enter a Nickname!");
+            socket = io.connect();
+            socketEvents();
         }
     }
 
@@ -126,11 +125,13 @@ $(function () {
                 FBLogin();
             } else {
                 console.log("No FB App canvas detected, redirecting to FB login page!");
-                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
+                FBLogin();
+                // window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
             }
         } else {
             console.log("No FB App canvas detected, redirecting to FB login page!");
-            window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
+            FBLogin();
+            // window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=527804323931798&redirect_uri=" + currentUrl + "&response_type=token");
         }
     }
 
