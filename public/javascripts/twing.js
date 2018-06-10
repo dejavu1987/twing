@@ -1,6 +1,5 @@
-
 class Twing {
-    constructor(pageId){
+    constructor(pageId) {
         this.pageId = pageId;
     }
 }
@@ -43,14 +42,14 @@ $(function () {
 
 
                 var user_id = response.authResponse.userID;
-                var fql_query = "SELECT uid FROM page_fan WHERE page_id = " + page_id + "and uid=" + user_id;
-                FB.Data.query(fql_query).wait(function (rows) {
-                    if (rows.length == 1 && rows[0].uid == user_id) {
-                        $('<p>&copy; https://apps.facebook.com/twingjitsu 2013</p>').appendTo('#footer');
-                    } else {
-                        $.tmpl('likePage', {}).appendTo('#footer');
-                    }
-                });
+                // var fql_query = "SELECT uid FROM page_fan WHERE page_id = " + page_id + "and uid=" + user_id;
+                // FB.Data.query(fql_query).wait(function (rows) {
+                //     if (rows.length == 1 && rows[0].uid == user_id) {
+                //     } else {
+                //     }
+                // });
+                $('<p>&copy; https://apps.facebook.com/twingjitsu 2013</p>').appendTo('#footer');
+                $.tmpl('likePage', {}).appendTo('#footer');
 
 
                 FB.api('/me', function (meRes) {
@@ -106,11 +105,11 @@ $(function () {
     };
 
     function showLoginOptionsAndLogin() {
-        if(confirm("Do you want to login with facebook?")){
+        if (confirm("Do you want to login with facebook?")) {
             loginWithFacebook();
-        }else{
+        } else {
             me.fbMe = {};
-            me.fbMe.id = Math.round(Math.random()*9999999);
+            me.fbMe.id = Math.round(Math.random() * 9999999);
             me.fbMe.name = prompt("Enter a Nickname!");
             socket = io.connect();
             socketEvents();
