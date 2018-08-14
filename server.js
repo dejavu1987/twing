@@ -12,7 +12,7 @@ var users = require('./routes/users');
 
 var app = express();
 //
-app.set('port', process.env.NODEJS_PORT || process.env.PORT || 8888);
+app.set('port', process.env.TWING_PORT || process.env.PORT || 8888);
 app.set('ip', process.env.NODEJS_IP || "0.0.0.0");
 
 var server = http.Server(app);
@@ -70,7 +70,7 @@ io.sockets.on('connection', function (socket) {
     twing.socketOnConnectionCallback(io, socket)
 });
 
-console.log("Server started: " + (process.env.NODEJS_IP || "0.0.0.0") + ":" + (process.env.NODEJS_PORT || process.env.PORT || 8888));
-server.listen((process.env.NODEJS_PORT || process.env.PORT || 8888), process.env.NODEJS_IP || "0.0.0.0");
+console.log("Server started: " + (process.env.NODEJS_IP || "0.0.0.0") + ":" + (process.env.TWING_PORT || process.env.PORT || 8888));
+server.listen((process.env.TWING_PORT || process.env.PORT || 8888), process.env.NODEJS_IP || "0.0.0.0");
 
 module.exports = app;
