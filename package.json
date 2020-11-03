@@ -1,6 +1,6 @@
 {
   "name": "twing",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node server.js",
@@ -21,7 +21,7 @@
     "mongoose": "^5.10.11",
     "morgan": "^1.10.0",
     "serve-favicon": "^2.5.0",
-    "socket.io": "^0.9.19"
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "eslint": "^7.12.1"

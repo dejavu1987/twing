@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
   Jabber = require('jabber'),
   jabber = new Jabber(),
   FB = require('fb');
@@ -21,25 +21,22 @@ var debug = [];
 FB.setAccessToken(
   process.env.FB_ACCESS_TOKEN || '527804323931798|vEinKlwRdO8Jxm6TcpcNLSW-OkI'
 );
+const mongoUrl = process.env.MONGODB_DB_URL || 'mongodb://localhost/twing';
 // Connect to MongoDB
-console.log(
-  'Connecting to MongoDB @ ' +
-    (process.env.MONGODB_DB_URL || 'mongodb://localhost/twing')
-);
-mongoose.connect(process.env.MONGODB_DB_URL || 'mongodb://localhost/twing', {
-  useNewUrlParser: true,
-});
-// mongoose.connect(
-//   'mongodb://nodejitsu:961ec2c420954980e319c721f31b0f21@linus.mongohq.com:10018/nodejitsudb3601504410'
-// );
-//mongoose.connect('mongodb://localhost');
+console.log('Connecting to MongoDB @ ' + mongoUrl);
+const connectDB = () =>
+  mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+connectDB();
 
-var db = mongoose.connection;
+const db = mongoose.connection;
+
 db.on('error', function () {
-  console.log('DB connection error!');
-  console.log('Reconnecting in 5s');
+  console.log('DB connection error! Reconnecting in 5s..');
   setTimeout(function () {
-    mongoose.connect(process.env.MONGODB_DB_URL || 'mongodb://localhost/twing');
+    connectDB();
   }, 5000);
 });
 
@@ -67,6 +64,7 @@ db.once('open', function () {
   ActionsM = mongoose.model('Actions', actionsSchema);
   console.log('Mongo connected');
 });
+
 exports.socketOnConnectionCallback = function (ioin, socket) {
   io = ioin;
   socket.join('lobby');
@@ -97,14 +95,16 @@ exports.socketOnConnectionCallback = function (ioin, socket) {
       }
     }
     console.log(fbMe.name + ' Connected!');
-    users[socket.id].name = fbMe.name;
-    users[socket.id].currScore = 0;
-    users[socket.id].score = 0;
-    users[socket.id].room = room;
-    users[socket.id].fbMe = fbMe;
-    users[socket.id].sid = socket.id;
+    users[socket.id] = {
+      name: fbMe.name,
+      currScore: 0,
+      score: 0,
+      room,
+      fbMe,
+      sid: socket.id,
+    };
     var me = users[socket.id];
-    me.room = room;
+
     rooms[room].players.pushUnique(me.name);
     io.sockets.emit('refresh rooms', rooms);
 
