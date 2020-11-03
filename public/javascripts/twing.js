@@ -167,7 +167,7 @@ $(function () {
         }
       },
       {
-        scope: 'publish_actions,publish_stream',
+        scope: 'public_profile,email',
       }
     );
   }
