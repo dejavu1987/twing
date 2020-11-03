@@ -26,7 +26,9 @@ console.log(
   'Connecting to MongoDB @ ' +
     (process.env.MONGODB_DB_URL || 'mongodb://localhost/twing')
 );
-mongoose.connect(process.env.MONGODB_DB_URL || 'mongodb://localhost/twing');
+mongoose.connect(process.env.MONGODB_DB_URL || 'mongodb://localhost/twing', {
+  useNewUrlParser: true,
+});
 // mongoose.connect(
 //   'mongodb://nodejitsu:961ec2c420954980e319c721f31b0f21@linus.mongohq.com:10018/nodejitsudb3601504410'
 // );
@@ -40,10 +42,12 @@ db.on('error', function () {
     mongoose.connect(process.env.MONGODB_DB_URL || 'mongodb://localhost/twing');
   }, 5000);
 });
+
 db.once('open', function () {
   var scoreSchema = mongoose.Schema({
     fbID: { type: Number, unique: true },
     name: { type: String },
+    authenticated: { type: Boolean, default: false },
     score: { type: Number, default: 0 },
     money: { type: Number, default: 0 },
   });

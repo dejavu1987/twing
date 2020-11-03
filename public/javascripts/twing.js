@@ -10,11 +10,13 @@ var currentUrl =
   window.location.host +
   '/' +
   window.location.pathname;
+
 var me = {};
 var gifts = {
   coins10: '10 coins',
   coinsLvl: 'x coins',
 };
+
 var friends = [];
 var appFriends = [];
 var sendMassGiftTo = [];
@@ -1360,6 +1362,7 @@ var foreach = function (arr, callback) {
     callback(i, arr[i]);
   }
 };
+
 var dlog = function (obj) {
   var objString = JSON.stringify(obj);
   var $dlogList = $('.dlog-list');
