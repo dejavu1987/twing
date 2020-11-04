@@ -8,7 +8,7 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:og='http://ogp.me/ns
     meta(name='distribution', content='global')
     meta(name='resource-type', content='document')
     meta(name='language', content='en')
-    link(href='images/logo-small.png', rel='shortcut icon', type='image/x-icon')
+    link(href='/images/logo-small.png', rel='shortcut icon', type='image/x-icon')
     link(href='//fonts.googleapis.com/css?family=Titillium+Web', rel='stylesheet', type='text/css')
     meta(property='fb:admins', content='dejavu1987')
     meta(property='fb:app_id', content='527804323931798')
@@ -16,7 +16,7 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:og='http://ogp.me/ns
     meta(property='og:title', content='Twing, Massively multiplayer Online mini game')
     meta(property='og:site_name', content='Twing')
     meta(property='og:description', content='Twing, Massively multiplayer Online mini game is currently on alpha test.')
-    meta(property='og:image', content='http://twing.jit.su/images/logo-big.png')
+    meta(property='og:image', content='/images/logo-big.png')
     meta(property='og:type', content='article')
     meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
     link(href='//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css', rel='stylesheet')
@@ -68,6 +68,7 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:og='http://ogp.me/ns
           a.invite.button(title="Invite") Invite
           a.highscores.button(title="Highscores") Highscores
           a.notifications.button(title="Notifications") Notifications
+      block content
       block stage
       #footer
       script(src='javascripts/facebook.js')

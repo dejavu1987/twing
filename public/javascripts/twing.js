@@ -283,10 +283,7 @@ $(function () {
         });
         socket.on('waiting for players', function () {
           dlog('Waiting for other players', 'error');
-          $('.stage').append(
-            '<div class="waiting-for-players instructions overlay"><div class="title"><h3>Twing!</h3></div><div class="how-to-play"><h3>Waiting for other players!</h3>\n\
-<h4>While waiting take a look at the instructions on game play.</h4><div class="desc clearfix"><ol class="how-to-list"><li class="how-to-item how-to-item-1">Drag a yellow disc and drop it to Gray tile with same symbol on it.</li><li class="how-to-item how-to-item-2">The tile will turn green and you will get 100 points.</li><li class="how-to-item how-to-item-3">The opponents does the same the gray tile will turn red.</li><li class="how-to-item how-to-item-4">Golden discs will give you <strong> +100 </strong>bonus scores.</li></ol></div></div><div class="draggable">♔</div><div class="droppable">♔</div><div class="cursor"></div><div class="score-up">+100</div></div>'
-          );
+          $('.stage').append($.tmpl('instructions'));
         });
         socket.on('stage ready', function (data) {
           console.log(data);
@@ -429,56 +426,63 @@ $(function () {
           });
         });
         socket.on('notifications', function (notifications) {
-          var notificationsHtml = '';
+          let notificationsHtml = '';
 
           $(notifications).each(function () {
-            //              console.log(this);
-            var itemClass = this.type;
+            const phrase =
+              this.type == 'gift' ? ' sent you ' : ' is in need of ';
+            const amount = this.amount + ' coins';
+            const label = phrase + amount + '!';
+            const actionText = this.type == 'gift' ? ' Accept ' : ' Send ';
 
-            var phrase = this.type == 'gift' ? ' sent you ' : ' is in need of ';
-            var amount = this.amount + ' coins';
-            var label = phrase + amount + '!';
-            var actionText = this.type == 'gift' ? ' Accept ' : ' Send ';
-            notificationsHtml +=
-              '<li class="clearfix notification-item ' +
-              itemClass +
-              '">\n\
-                                  <div class="notification-img-wrapper">\n\
-              <img class="notification-user-img" src="https://graph.facebook.com/' +
-              this.senderID +
-              '/picture"></div>\n\
-<div class="notification-label">' +
-              label +
-              '</div>\n\
-     <div class="notification-action"> <a class="accept-' +
-              this.type +
-              ' button" data-amount="' +
-              this.amount +
-              '" data-action-id="' +
-              this._id +
-              '" data-sender="' +
-              this.senderID +
-              '" data-name="' +
-              this.name +
-              '">' +
-              actionText +
-              '</a></div></li>';
+            notificationsHtml += `<li class="clearfix notification-item ${this.type}">
+              <div class="notification-img-wrapper">
+                <img
+                  class="notification-user-img"
+                  src="https://graph.facebook.com/${this.senderID}/picture"
+                />
+              </div>
+              <div class="notification-label">${label}</div>
+              <div class="notification-action">
+                <a
+                  class="accept-${this.type} button"
+                  data-amount="${this.amount}"
+                  data-action-id="${this._id}"
+                  data-sender="${this.senderID}"
+                  data-name="${this.name}"
+                  >${actionText}</a
+                >
+              </div>
+            </li>
+            `;
           });
+
           notificationsHtml = notificationsHtml
             ? notificationsHtml
-            : '<li class="clearfix notification-item empty-notifications">\n\
-                                  <div class="notification-img-wrapper">\n\
-              <img class="notification-user-img" src="images/empty-50.png"></div>\n\
-<div class="notification-label">No new notifications! Need some coins? Ask for coins with your friends!</div>\n\
-     <div class="notification-action"> <a class="send-mass-help-request button" >Ask for Coins</a></div></li>';
-          $('.stage').append(
-            '<div class="overlay notifications"><a href="#" class="close cross"><i class="icon-remove"></i></a><div class="notifications-wrapper"><h3>Notifications\n\
-</h3>\n\
-<div class="desc clearfix">\n\
-<ul class="board-list">' +
-              notificationsHtml +
-              '</ul></div></div></div>'
-          );
+            : `<li class="clearfix notification-item empty-notifications">
+                <div class="notification-img-wrapper">
+                  <img class="notification-user-img" src="images/empty-50.png" />
+                </div>
+                <div class="notification-label">
+                  No new notifications! Need some coins? Ask for coins with your friends!
+                </div>
+                <div class="notification-action">
+                  <a class="send-mass-help-request button">Ask for Coins</a>
+                </div>
+              </li>`;
+
+          $('.stage').append(`<div class="overlay notifications">
+                <a href="#" class="close cross"><i class="icon-remove"></i></a>
+                <div class="notifications-wrapper">
+                  <h3>Notifications</h3>
+                  <div class="desc clearfix">
+                    <ul class="board-list">
+                      ${notificationsHtml}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              `);
 
           $('.board-list').slimScroll({
             height: 456,
