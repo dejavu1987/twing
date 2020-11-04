@@ -4,12 +4,7 @@ class Twing {
   }
 }
 
-var currentUrl =
-  window.location.protocol +
-  '//' +
-  window.location.host +
-  '/' +
-  window.location.pathname;
+var currentUrl = `${window.location.protocol}//${window.location.host}/${window.location.pathname}`;
 
 var me = {};
 var gifts = {
@@ -98,17 +93,19 @@ $(function () {
           }
           var massGiftUsersHTML = '';
           sendMassGiftTo.forEach(function (fbId) {
-            massGiftUsersHTML +=
-              '<div class="mass-user-thumb"><img src="https://graph.facebook.com/' +
-              fbId +
-              '/picture" /></div>';
+            massGiftUsersHTML += `<div class="mass-user-thumb"><img src="https://graph.facebook.com/${fbId}/picture" /></div>`;
           });
           $('.stage').append(
-            '<div class="overlay send-mass-gifts-overlay"><a href="#" class="cross close"><i class="icon-remove"></i></a><div class="overlay-wrapper"><h3>Gift your friends some coins.</h3>\n\
-                <div class="desc clearfix">Send some coins to your friends who are in need of it. You may get some in return. :)     <br/> ' +
-              massGiftUsersHTML +
-              '  \n\
-                </div><a href="#" class="send-mass-gifts button">Send Coins</a></div></div>'
+            `<div class="overlay send-mass-gifts-overlay">
+            <a href="#" class="cross close"><i class="icon-remove"></i></a>
+            <div class="overlay-wrapper">
+            <h3>Gift your friends some coins.</h3>
+                <div class="desc clearfix">Send some coins to your friends who are in need of it. You may get some in return. :)
+                <br/> ${massGiftUsersHTML}  
+                </div>
+                <a href="#" class="send-mass-gifts button">Send Coins</a>
+              </div>
+            </div>`
           );
         });
       } else {
@@ -213,23 +210,15 @@ $(function () {
     $('.me-image')
       .empty()
       .append(
-        '<img class="me-thumb" src="https://graph.facebook.com/' +
-          me.fbMe.id +
-          '/picture">'
+        `<img class="me-thumb" src="https://graph.facebook.com/${me.fbMe.id}/picture">`
       );
 
     $me.empty();
-    $me.append('<div class="me-name">' + me.fbMe.name + '</div>');
-    $me.append('<div class="me-money">' + me.money + '</div>');
+    $me.append(`<div class="me-name">${me.fbMe.name}</div>`);
+    $me.append(`<div class="me-money">${me.money}</div>`);
     $me.append(
-      '<div class="me-level" title="Next level at scores of ' +
-        me.nextLevelIn +
-        '!" >\n\
-    <div class="me-level-progress"><div class="me-level-text">Level ' +
-        me.level +
-        '</div><div class="filler" style="width:' +
-        me.levelProgress +
-        '%"></div></div></div>'
+      `<div class="me-level" title="Next level at scores of ${me.nextLevelIn}!" >
+    <div class="me-level-progress"><div class="me-level-text">Level ${me.level}</div><div class="filler" style="width:${me.levelProgress}%"></div></div></div>`
     );
     $me.append('<div class="theme"></div><div class="my-score"></div>');
     if (callback) callback();
@@ -264,7 +253,7 @@ $(function () {
         });
         socket.on('drag', function (data) {
           console.log(data);
-          $('.draggable[rel=' + data.block + ']').css({
+          $(`.draggable[rel=${data.block}]`).css({
             top: data.position.top,
             left: data.position.left,
           });
@@ -297,7 +286,7 @@ $(function () {
           addDraggables(data);
           sortBlocks(data);
           stageReady();
-          dlog('The game begins!!!! Theme is ' + data.theme.name, 'success');
+          dlog(`The game begins!!!! Theme is ${data.theme.name}`, 'success');
           $('.theme').html(data.theme.name);
         });
         socket.on('userlist', function (data) {
@@ -308,7 +297,7 @@ $(function () {
           var $room = $('.room');
 
           $room.empty();
-          $room.append('<strong> ' + data.roomName + '</strong>');
+          $room.append(`<strong> ${data.roomName}</strong>`);
           //console.log(users);
           if (room != 'lobby') {
             $('.stage').append(
@@ -340,20 +329,16 @@ $(function () {
           //                dlog(data.name+" Matched "+data.block+"!",'success');
           var newScore = 100;
           if (data.block % 11 == 0 || data.block > 39) newScore += 100;
-          $('#' + data.id + '-score')
+          $(`#${data.id}-score`)
             .find('.score')
             .text(
-              parseInt(
-                $('#' + data.id + '-score')
-                  .find('.score')
-                  .text()
-              ) + newScore
+              parseInt($(`#${data.id}-score`).find('.score').text()) + newScore
             );
           lockBlock(data.block);
         });
         socket.on('leave', function (leaver) {
-          dAlert(leaver + ' left!', 'error');
-          dlog(leaver + ' left!', 'error');
+          dAlert(`${leaver} left!`, 'error');
+          dlog(`${leaver} left!`, 'error');
           removeCursors(leaver);
           removeScore(leaver);
         });
@@ -362,37 +347,41 @@ $(function () {
 
           $(scores).each(function () {
             var itemClass = this.fbID == me.fbMe.id ? 'me' : '';
-            highscoresHtml +=
-              '<li class="user-thumbnail ' +
-              itemClass +
-              '">\n\
-                                  <div class="user-thumbnail-img-wrapper">\n\
-              <img class="user-thumbnail-img" src="https://graph.facebook.com/' +
-              this.fbID +
-              '/picture?width=100&height=100"><div class="user-thumb-level">' +
-              userLevelCalculate(this.score).level +
-              '</div></div>\n\
-                                  <div class="user-thumb-name">' +
-              this.name +
-              '</div> <div class="user-thumb-score">' +
-              this.score +
-              '</div>\n\
-                                  <div class="user-thumb-money">' +
-              this.money +
-              '</div></li>';
+            highscoresHtml += `
+            <li class="user-thumbnail ${itemClass}">
+              <div class="user-thumbnail-img-wrapper">
+                <img
+                  class="user-thumbnail-img"
+                  src="https://graph.facebook.com/${
+                    this.fbID
+                  }/picture?width=100&height=100"
+                />
+                <div class="user-thumb-level">
+                  ${userLevelCalculate(this.score).level}
+                </div>
+              </div>
+              <div class="user-thumb-name">${this.name}</div>
+              <div class="user-thumb-score">${this.score}</div>
+              <div class="user-thumb-money">${this.money}</div>
+            </li>`;
           });
           $('.stage').append(
-            '<div class="overlay highscores"><a href="#" class="close cross"><i class="icon-remove"></i></a><div class="highscores-wrapper"><h3>Highscores\n\
-</h3>\n\
-<div class="desc clearfix">\n\
-<ul id="sort-by">\n\
-  <li><a href="#name">Name</a></li>\n\
-  <li><a href="#score">Scores</a></li>\n\
-  <li><a href="#money">Coins</a></li>\n\
-</ul>\n\
-<ul class="board-list clearfix">' +
-              highscoresHtml +
-              '</ul></div></div></div>'
+            `<div class="overlay highscores">
+                <a href="#" class="close cross"><i class="icon-remove"></i></a>
+                <div class="highscores-wrapper">
+                  <h3>Highscores</h3>
+                  <div class="desc clearfix">
+                    <ul id="sort-by">
+                      <li><a href="#name">Name</a></li>
+                      <li><a href="#score">Scores</a></li>
+                      <li><a href="#money">Coins</a></li>
+                    </ul>
+                    <ul class="board-list clearfix">
+                      ${highscoresHtml}
+                    </ul>
+                  </div>
+                </div>
+              </div>`
           );
           $('.board-list').slimScroll({
             height: 456,
@@ -537,61 +526,64 @@ $(function () {
         });
         socket.on('duel accepted', function (duel) {
           console.log('Dual Challenge Accepted!');
-          //            console.log(duel);
-          var duelOverlay =
-            '<div class="overlay duel-overlay">\n\
-                  <div class="overlay-wrapper">\n\
-                    <div class="desc"><div class="user-thumb"><img src="https://graph.facebook.com/' +
-            duel.target.fbMe.id +
-            '/picture" /></div>' +
-            duel.target.fbMe.name +
-            ' has accepted your challenge for a duel.</div>\n\
-<div class="actions clearfix">\n\
-                    <a href="#" class="join-duel button" data-duel-id="' +
-            duel.id +
-            '" id="close-overlay">Join</a>\n\
-                    </div>\n\
-                    \n\
-                  </div>\n\
-                </div>';
+
+          var duelOverlay = `
+              <div class="overlay duel-overlay">
+                <div class="overlay-wrapper">
+                  <div class="desc">
+                    <div class="user-thumb">
+                      <img src="https://graph.facebook.com/${duel.target.fbMe.id}/picture" />
+                    </div>
+                    ${duel.target.fbMe.name} has accepted your challenge for a duel.
+                  </div>
+                  <div class="actions clearfix">
+                    <a
+                      href="#"
+                      class="join-duel button"
+                      data-duel-id="${duel.id}"
+                      id="close-overlay"
+                      >Join</a
+                    >
+                  </div>
+                </div>
+              </div>`;
           $('.stage').append(duelOverlay);
           $('.duel-overlay').hide().slideDown().draggable();
         });
         socket.on('duel rejected', function (duel) {
           console.log('Dual Challenge Rejected!');
-          //            console.log(duel);
-          var duelOverlay =
-            '<div class="overlay duel-overlay"><a href="#" class="close cross"><i class="icon-remove"></i></a>\n\
-                  <div class="overlay-wrapper">\n\
-                    <div class="desc"><div class="user-thumb"><img src="https://graph.facebook.com/' +
-            duel.target.fbMe.id +
-            '/picture" /></div>' +
-            duel.target.fbMe.name +
-            ' has rejected your challenge for a duel.\n\
-                    </div>\n\
-                  </div>\n\
-                </div>';
+          var duelOverlay = `<div class="overlay duel-overlay">
+            <a href="#" class="close cross"><i class="icon-remove"></i></a>
+            <div class="overlay-wrapper">
+              <div class="desc">
+                <div class="user-thumb">
+                  <img src="https://graph.facebook.com/${duel.target.fbMe.id}/picture" />
+                </div>
+                ${duel.target.fbMe.name} has rejected your challenge for a duel.
+              </div>
+            </div>
+          </div>
+          `;
           $('.stage').append(duelOverlay);
           $('.duel-overlay').hide().slideDown().draggable;
         });
         socket.on('gift', function (data) {
           console.log('New Gift!');
-          //            console.log(data);
-          var duelOverlay =
-            '<div class="overlay gift-overlay volatile"><a href="#" class="close cross"><i class="icon-remove"></i></a>\n\
-                  <div class="overlay-wrapper">\n\
-                    <div class="desc"><div class="user-thumb"><img src="https://graph.facebook.com/' +
-            data.sender.fbMe.id +
-            '/picture" /></div>' +
-            data.sender.fbMe.name +
-            ' has sent you ' +
-            gifts[data.gift] +
-            '.\n\
-<div class="actions clearfix">\n\
-                    </div>\n\
-                    </div>\n\
-                  </div>\n\
-                </div>';
+          var duelOverlay = `<div class="overlay gift-overlay volatile">
+            <a href="#" class="close cross"><i class="icon-remove"></i></a>
+            <div class="overlay-wrapper">
+              <div class="desc">
+                <div class="user-thumb">
+                  <img src="https://graph.facebook.com/${
+                    data.sender.fbMe.id
+                  }/picture" />
+                </div>
+                ${data.sender.fbMe.name} has sent you ${gifts[data.gift]}.
+                <div class="actions clearfix"></div>
+              </div>
+            </div>
+          </div>
+          `;
           $('.stage').append(duelOverlay);
           $('.duel-overlay').hide().slideDown().draggable();
         });
@@ -656,23 +648,17 @@ $(function () {
               me.money += this.betMoney ? this.betMoney : 10;
               updateMeInfo();
             } else {
-              userListHtml +=
-                this.name +
-                ' (' +
-                this.currScore +
-                ')<br>\n\
-                   ';
+              userListHtml += `${this.name} (${this.currScore})<br>
+                   `;
             }
-            scoreHtml +=
-              '<li class="final-score-item ' +
-              classes +
-              '"><img class="list-user-thumb" src="https://graph.facebook.com/' +
-              this.id +
-              '/picture"><label>' +
-              this.name +
-              '</label> <span class="score">' +
-              this.currScore +
-              '</score></li>';
+            scoreHtml = `
+              <li class="final-score-item ${classes}">
+                <img
+                  class="list-user-thumb"
+                  src="https://graph.facebook.com/${this.id}/picture"
+                />
+                <label>${this.name}</label> <span class="score">${this.currScore}</span>
+              </li>`;
           });
           var shareBtn = '';
           if (scores[0].id == me.fbMe.id) {
@@ -680,24 +666,30 @@ $(function () {
               '<a href="#" class="share brag button"><i class="icon-trophy"></i> Share</a>';
             window.bragData = { userListHtml: userListHtml, scores: scores };
           }
-          $('.stage').append(
-            '<div class="overlay final-scores"><a href="#" class="close cross"><i class="icon-remove"></i></a><div class="game-over-wrapper"><h3>GAME OVER</h3>\n\
-                <div class="desc clearfix">Scoreboard:        \n\
-                 <ol class="board-list">' +
-              scoreHtml +
-              '</ol>' +
-              shareBtn +
-              ' <a href="#" class="close button red"><i class="icon-remove"></i> close</a></div></div></div>'
-          );
+          $('.stage').append(`<div class="overlay final-scores">
+            <a href="#" class="close cross"><i class="icon-remove"></i></a>
+            <div class="game-over-wrapper">
+              <h3>GAME OVER</h3>
+              <div class="desc clearfix">
+                Scoreboard:
+                <ol class="board-list">
+                  ${scoreHtml}
+                </ol>
+                ${shareBtn}
+                <a href="#" class="close button red"><i class="icon-remove"></i> close</a>
+              </div>
+            </div>
+          </div>
+          `);
         });
         socket.on('message', function (data) {
-          dlog(data.name + ' > ' + data.message, 'message');
+          dlog(`${data.name} > ${data.message}`, 'message');
           //            $('#'+data.name+"-cursor").find('span.status').text(data.message);
         });
 
         function onCursorMove(data) {
           // var sp = $('.stage').position();
-          $('#' + data.id + '-cursor').css({
+          $(`#${data.id}-cursor`).css({
             top: data.position.top,
             left: data.position.left,
           });
@@ -970,23 +962,21 @@ $(function () {
     //      console.log("addScore user");
     //      console.log(user);
     if (!$('#' + user.id + '-score').length && user.name != 'unnamed')
-      $('.scores-list').append(
-        '<li class="others-score user-context" id="' +
-          user.id +
-          '-score" data-uid="' +
-          user.fbMe.id +
-          '" data-sid="' +
-          user.id +
-          '"  data-money="' +
-          user.money +
-          '" data-name="' +
-          user.fbMe.name +
-          '"><img class="list-user-thumb" src="https://graph.facebook.com/' +
-          user.fbMe.id +
-          '/picture"><label>' +
-          user.name +
-          '</label> [<span class="score">0</span>]</div>'
-      );
+      $('.scores-list').append(`<li
+        class="others-score user-context"
+        id="${user.id}-score"
+        data-uid="${user.fbMe.id}"
+        data-sid="${user.id}"
+        data-money="${user.money}"
+        data-name="${user.fbMe.name}"
+      >
+        <img
+          class="list-user-thumb"
+          src="https://graph.facebook.com/${user.fbMe.id}/picture"
+        />
+        <label>${user.name}</label>
+        [<span class="score">0</span>]
+      </li>`);
   }
 
   function removeScore(user) {
@@ -997,15 +987,10 @@ $(function () {
 
   function addCursors(user) {
     if (!$('#' + user.id + '-cursor').length && user.name != 'unnamed')
-      $('.stage').append(
-        '<div class="cursor ' +
-          user.fbMe.gender +
-          '" id="' +
-          user.id +
-          '-cursor">' +
-          user.name +
-          '<span class="status"></span></div>'
-      );
+      $('.stage')
+        .append(`<div class="cursor ${user.fbMe.gender}" id="${user.id}-cursor">
+          ${user.name}<span class="status"></span>
+        </div>`);
   }
 
   function removeCursors(user) {
@@ -1021,62 +1006,61 @@ $(function () {
         var availableTip = '';
         var availableFlag = false;
         if (!hosts[hostName].available) {
-          availableTip =
-            'The host ' +
-            hosts[hostName].name +
-            ' has already started the game! Join another host or Host a new game.';
+          availableTip = `The host ${hosts[hostName].name} has already started the game! Join another host or Host a new game.`;
         } else if (hosts[hostName].players.length > 4) {
-          availableTip =
-            hosts[hostName].name +
-            ' is full! Join another host or Host a new game.';
+          availableTip = `${hosts[hostName].name} is full! Join another host or Host a new game.`;
         } else {
-          availableTip = 'Click to join ' + hosts[hostName].name;
+          availableTip = `Click to join ${hosts[hostName].name}`;
           availableFlag = true;
         }
-        hostsList +=
-          '<li class="' +
-          hosts[hostName].name +
-          ' available-' +
-          availableFlag +
-          '"><a title="' +
-          availableTip +
-          '" href="#" rel="' +
-          hostName +
-          '"><strong>' +
-          hosts[hostName].name +
-          '</strong> (<strong class="host-player-count">' +
-          hosts[hostName].players.length +
-          '</strong>/5)</a><div class="players-in-host"><span>' +
-          hosts[hostName].players.join('</span><span>') +
-          '</span></div></li>';
+        hostsList += `<li class="${
+          hosts[hostName].name
+        } available-${availableFlag}">
+            <a title="${availableTip}" href="#" rel="${hostName}"
+              ><strong>${
+                hosts[hostName].name
+              }</strong> (<strong class="host-player-count"
+                >${hosts[hostName].players.length}</strong
+              >/5)</a
+            >
+            <div class="players-in-host">
+              <span>${hosts[hostName].players.join('</span><span>')}</span>
+            </div>
+          </li>`;
       }
     }
     if (noHosts) {
-      hostsList =
-        '<li>There are no hosts available right now.</li>\n\
-<li>Host new game by clicking on the button below.</li>\n\
-<li>You can chat with the players by pressing ENTER.</li>\n\
-<li>The online players are listed on the green bar.</li>\n\
-<li>If nobody is online, Invite your close friends to play realtime, Click on Invite Friends button on the right.</li>\n\
-<li>Play frequently and you stand a chance to be on the highscores list.</li>\n\
-<li>View the highscores list by clicking on the Highscores button.</li>\n\
-';
+      hostsList = `<li>There are no hosts available right now.</li>
+        <li>Host new game by clicking on the button below.</li>
+        <li>You can chat with the players by pressing ENTER.</li>
+        <li>The online players are listed on the green bar.</li>
+        <li>
+          If nobody is online, Invite your close friends to play realtime, Click on
+          Invite Friends button on the right.
+        </li>
+        <li>Play frequently and you stand a chance to be on the highscores list.</li>
+        <li>View the highscores list by clicking on the Highscores button.</li>`;
     }
-    $('.stage').append(
-      '<div class="overlay hosts"><div class="overlay-wrapper"><h3>Hosts</h3>\n\
-          <div class="desc clearfix">\n\
-            <ol class="hosts-list">' +
-        hostsList +
-        '</ol><a class="button create-host">Host a new game</a></div></div></div>'
-    );
+    $('.stage').append(`<div class="overlay hosts">
+      <div class="overlay-wrapper">
+        <h3>Hosts</h3>
+        <div class="desc clearfix">
+          <ol class="hosts-list">
+            ${hostsList}
+          </ol>
+          <a class="button create-host">Host a new game</a>
+        </div>
+      </div>
+    </div>
+    `);
   }
 
   function lockBlock(block) {
-    $('.draggable[rel=' + block + ']').remove();
+    $(`.draggable[rel=${block}]`).remove();
     if (!$('.draggable').length) {
       socket.emit('game over');
     }
-    $('.droppable[rel=' + block + ']').addClass('lost');
+    $(`.droppable[rel=${block}]`).addClass('lost');
   }
 
   // Rearrange the Blocks after reading the maps from server
@@ -1240,47 +1224,37 @@ $(function () {
       console.log(hexVal);
       $('.stage')
         .append(
-          '<div class="draggable ' +
-            classes +
-            '" rel="' +
-            i +
-            '">&#x' +
-            hexVal +
-            ';</div>'
+          `<div class="draggable ${classes}" rel="${i}">&#x${hexVal};</div>`
         )
-        .append(
-          '<div class="droppable" rel="' + i + '">&#x' + hexVal + ';</div>'
-        );
+        .append(`<div class="droppable" rel="${i}">&#x${hexVal};</div>`);
     }
   }
 
   function showContextMenu(e) {
     var $context = $(e.currentTarget);
     $context.append(
-      '<div class="context-menu clearfix glass">\n\
-              <div class="context-img"><img src="https://graph.facebook.com/' +
-        $context.attr('data-uid') +
-        '/picture"/></div>\n\
-              <div class="context-detail">\n\
-              <h5 class="context-title">' +
-        $context.attr('data-name') +
-        '</h5>\n\
-                <ul class="context-menu-list">\n\
-              <li class="context-link challenge-duel" data-action="challenge" data-money="' +
-        $context.attr('data-money') +
-        '" data-sid="' +
-        $context.attr('data-sid') +
-        '" data-uid="' +
-        $context.attr('data-uid') +
-        '" title="Challange for a Dual">Challange Dual</li>\n\
-              <li class="context-link send-gift" data-action="gift" data-sid="' +
-        $context.attr('data-sid') +
-        '" data-uid="' +
-        $context.attr('data-uid') +
-        '" title="Send a Gift">Send Gift</li>\n\
-              </ul>\n\
-                  </div>\n\
-              </div>'
+      `<div class="context-menu clearfix glass">
+              <div class="context-img"><img src="https://graph.facebook.com/${$context.attr(
+                'data-uid'
+              )}/picture"/></div>
+              <div class="context-detail">
+              <h5 class="context-title">${$context.attr('data-name')}</h5>
+                <ul class="context-menu-list">
+              <li class="context-link challenge-duel" data-action="challenge" data-money="${$context.attr(
+                'data-money'
+              )}" data-sid="${$context.attr(
+        'data-sid'
+      )}" data-uid="${$context.attr(
+        'data-uid'
+      )}" title="Challange for a Dual">Challange Dual</li>
+                      <li class="context-link send-gift" data-action="gift" data-sid="${$context.attr(
+                        'data-sid'
+                      )}" data-uid="${$context.attr(
+        'data-uid'
+      )}" title="Send a Gift">Send Gift</li>
+              </ul>
+                  </div>
+              </div>`
     );
     //            console.log(e);
     //            console.log($(e.currentTarget));
@@ -1308,7 +1282,7 @@ $(function () {
   }
 
   function brag(data) {
-    var bragTitle = 'And here is your winner ' + me.fbMe.name + '!';
+    var bragTitle = `And here is your winner ${me.fbMe.name}!`;
     var bragCaption = data.userListHtml;
     var bragDesc =
       'I just scored highest score ' +
@@ -1316,18 +1290,10 @@ $(function () {
       ' among all my opponents in TWING!';
     if (data.scores.length == 2) {
       bragTitle = 'You loose I win!';
-      bragDesc =
-        'I just won a duel challenge with ' +
-        data.scores[0].currScore +
-        ' scores against ' +
-        data.scores[1].name +
-        '!';
+      bragDesc = `I just won a duel challenge with ${data.scores[0].currScore} scores against ${data.scores[1].name}!`;
     } else {
       bragTitle = 'You guys need some more practice!';
-      bragDesc =
-        'I just scored highest score ' +
-        data.scores[0].currScore +
-        ' among all my opponents in TWING!';
+      bragDesc = `I just scored highest score ${data.scores[0].currScore} among all my opponents in TWING!`;
     }
     FB.ui(
       {
@@ -1347,7 +1313,7 @@ $(function () {
     exdate.setDate(exdate.getDate() + exdays);
     var c_value =
       escape(value) +
-      (exdays == null ? '' : '; expires=' + exdate.toUTCString());
+      (exdays == null ? '' : `; expires=${exdate.toUTCString()}`);
     document.cookie = c_name + '=' + c_value;
   }
 
@@ -1382,7 +1348,7 @@ var dlog = function (obj) {
   var objString = JSON.stringify(obj);
   var $dlogList = $('.dlog-list');
   var liclass = arguments[1] ? arguments[1] : 'notice';
-  $dlogList.append('<li class="' + liclass + '">' + objString + '</li>');
+  $dlogList.append(`<li class="${liclass}">${objString}</li>`);
   //          $('.dlog-wrapper').effect("shake", { direction: 'up', times:2, distance:2 },100);
 };
 
@@ -1406,11 +1372,14 @@ $(document).ready(function () {
 
 function dAlert(msg, theme) {
   $('.stage').append(
-    '<div class="overlay dAlert volatile ' +
-      theme +
-      '"><a href="#" class="close cross"><i class="icon-remove"></i></a><div class="overlay-wrapper"><h3>Oops.. </h3><div class="desc clearfix">' +
-      msg +
-      '</div></div></div>'
+    `<div class="overlay dAlert volatile ${theme}">
+      <a href="#" class="close cross">
+        <i class="icon-remove"></i></a>
+        <div class="overlay-wrapper">
+        <h3>Oops.. </h3>
+        <div class="desc clearfix">${msg}</div>
+      </div>
+    </div>`
   );
 }
 
