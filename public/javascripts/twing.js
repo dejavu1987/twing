@@ -236,6 +236,10 @@ $(function () {
   };
 
   function socketEvents() {
+    console.log('Loading sounds');
+    const joinedSound = new sound(
+      'https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-46416/zapsplat_technology_videogame_controller_xbox_set_down_wood_table_002_47651.mp3'
+    );
     console.log('Loading socket events!');
     socket.on('connect', function () {
       console.log('Socket connected to server!');
@@ -269,6 +273,8 @@ $(function () {
         socket.on('cursor move', onCursorMove);
         socket.on('add me', function (me) {
           //            console.log("add me - me");
+
+          joinedSound.play();
           console.log(me);
           dlog(me.name + ' joined!!', 'success');
           addCursors(me);
@@ -500,27 +506,32 @@ $(function () {
         socket.on('challenge', function (challenger, duel) {
           console.log('New Dual Challenge!');
           //            console.log(challenger);
-          var duelOverlay =
-            '<div class="overlay duel-overlay">\n\
-                  <div class="overlay-wrapper">\n\
-                    <div class="desc"><div class="user-thumb"><img src="https://graph.facebook.com/' +
-            challenger.fbMe.id +
-            '/picture" /></div>' +
-            challenger.fbMe.name +
-            ' has challenged you for a duel. <br/>Bet amount: $' +
-            duel.bet +
-            '</div>\n\
-<div class="actions clearfix">\n\
-                    <a href="#" class="accept-duel button" data-duel-id="' +
-            duel.id +
-            '" id="close-overlay">Accept</a>\n\
-                     <a href="#" class="reject-duel button" data-duel-id="' +
-            duel.id +
-            '" id="close-overlay">Reject</a>\n\
-                    \n\
-                    </div>\n\
-                  </div>\n\
-                </div>';
+          var duelOverlay = `<div class="overlay duel-overlay">
+                  <div class="overlay-wrapper">
+                    <div class="desc">
+                      <div class="user-thumb">
+                        <img src="https://graph.facebook.com/${challenger.fbMe.id}/picture" />
+                      </div>
+                      ${challenger.fbMe.name} has challenged you for a duel. <br />Bet amount: $
+                      ${duel.bet}
+                    </div>
+                    <div class="actions clearfix">
+                      <a
+                        href="#"
+                        class="accept-duel button"
+                        data-duel-id="${duel.id}"
+                        id="close-overlay"
+                        >Accept</a>
+                      <a
+                        href="#"
+                        class="reject-duel button"
+                        data-duel-id="${duel.id}"
+                        id="close-overlay"
+                        >Reject</a>
+                    </div>
+                  </div>
+                </div>
+                `;
           $('.stage').append(duelOverlay);
           $('.duel-overlay').hide().slideDown().draggable();
         });
@@ -1428,4 +1439,19 @@ function scrollFriends(evt) {
       )
     );
   }
+}
+
+function sound(src) {
+  this.sound = document.createElement('audio');
+  this.sound.src = src;
+  this.sound.setAttribute('preload', 'auto');
+  this.sound.setAttribute('controls', 'none');
+  this.sound.style.display = 'none';
+  document.body.appendChild(this.sound);
+  this.play = function () {
+    this.sound.play();
+  };
+  this.stop = function () {
+    this.sound.pause();
+  };
 }
