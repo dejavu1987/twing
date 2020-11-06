@@ -20,25 +20,25 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:og='http://ogp.me/ns
     meta(property='og:type', content='article')
     meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
     link(href='//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css', rel='stylesheet')
-    link(rel='stylesheet', href='stylesheets/jquery-ui.css')
-    link(rel='stylesheet', href='stylesheets/draggable.css')
-    script(src='javascripts/jquery.min.js')
-    script(src='javascripts/jquery.tmpl.js')
+    link(rel='stylesheet', href='/stylesheets/vendor/jquery-ui.css')
+    link(rel='stylesheet', href='/stylesheets/twing.css')
+    script(src='javascripts/vendor/jquery.min.js')
+    script(src='javascripts/vendor/jquery.tmpl.js')
     script(src='javascripts/templates.js')
 
-    script(src='javascripts/jquery-ui.min.js')
+    script(src='javascripts/vendor/jquery-ui.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.js')
-    script(src='javascripts/jquery.ui.touch-punch.min.js')
-    script(src='javascripts/jquery.ba-throttle-debounce.js')
+    script(src='javascripts/vendor/jquery.ui.touch-punch.min.js')
+    script(src='javascripts/vendor/jquery.ba-throttle-debounce.js')
     script(src='/socket.io/socket.io.js')
-    script(src='javascripts/twing.js')
-    script(src='javascripts/jquery.isotope.min.js')
-    script(src='javascripts/jquery.slimscroll.min.js')
+    script(src='/dist/app.js')
+    script(src='javascripts/vendor/jquery.isotope.min.js')
+    script(src='javascripts/vendor/jquery.slimscroll.min.js')
    
     //script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
     //script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js')
     //link(rel='stylesheet', href='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css')
-    //link(rel='stylesheet', href='css/draggable.css')
+    //link(rel='stylesheet', href='css/twing.css')
     //script(src='js/jquery.ui.touch-punch.min.js')
     //script(src='/socket.io/socket.io.js')
 
@@ -71,4 +71,3 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:og='http://ogp.me/ns
       block content
       block stage
       #footer
-      script(src='javascripts/facebook.js')

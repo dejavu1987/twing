@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   env: {
     browser: true,
     es6: true,
@@ -7,6 +7,9 @@ export default {
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
+    FB: true,
+    $: true,
+    io: true,
   },
   parserOptions: {
     ecmaVersion: 2018,
