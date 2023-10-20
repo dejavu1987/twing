@@ -5,8 +5,10 @@ import Twing from './twing.js';
 
 const twing = new Twing();
 let me = {};
+let bragData;
 // var currentUrl = `${window.location.protocol}//${window.location.host}/${window.location.pathname}`;
 
+// @type any[]
 var friends = [];
 var appFriends = [];
 var sendMassGiftTo = [];
@@ -65,6 +67,7 @@ $(function () {
         });
 
         console.log('Getting Twing player frens!');
+
         FB.api('/me/friends?fields=installed', function (response) {
           console.log('Got twing player frens!');
           friends = response.data;
@@ -79,9 +82,7 @@ $(function () {
           socket.emit('get appFriends', appFriends);
 
           if (appFriends.length > 50) {
-            sendMassGiftTo = appFriends.sort(function (a, b) {
-              return Math.random() - 0.5;
-            });
+            sendMassGiftTo = appFriends.sort(() => Math.random() - 0.5);
           } else {
             sendMassGiftTo = appFriends;
           }
@@ -594,7 +595,7 @@ $(function () {
           if (scores[0].id == me.fbMe.id) {
             shareBtn =
               '<a href="#" class="share brag button"><i class="icon-trophy"></i> Share</a>';
-            window.bragData = { userListHtml: userListHtml, scores: scores };
+            bragData = { userListHtml: userListHtml, scores: scores };
           }
           $('.stage').append(`<div class="overlay final-scores">
             <a href="#" class="close cross"><i class="icon-remove"></i></a>
@@ -1250,7 +1251,7 @@ $(document).ready(function () {
   );
   $('ul.dlog-list').draggable({
     axis: 'y',
-    stop: function (event, ui) {
+    stop: function () {
       $('ul.dlog-list').css({
         top: 'initial',
         bottom: '0',
